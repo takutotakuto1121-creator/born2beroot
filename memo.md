@@ -9,7 +9,7 @@
 
 ## VirtualBox
 ### VirtualBoxとは
-**VirtualBox**とは、既存のOS上で別yのOSを実行するのに使う仮想環境を構築するためのオープンソフトウェアです。ホストOS型で使用される仮想化ソフトウェアの１つです。
+**VirtualBox**とは、既存のOS上で別yのOSを実行するのに使う仮想環境を構築するためのオープンソフトウェアです。ホストOS型で使用される仮想化ソフトウェアの１つです。macOSでは使用できません。
 ### 使用方法
 #### ダウンロード
 まずはVirtualBoxを[公式サイト](https://www.virtualbox.org/?_fsi=smWrwEF7)からダウンロードしてきます。
@@ -48,8 +48,54 @@ Nameには仮想環境の名前を、Folderには仮想環境を構築するフ�
 
 設定したdebianがホーム画面の左側に表示されます。選択してStartを押して起動します。
 
-![image](assets/virtualbox/virtualbox_7.png
-)
+![image](assets/virtualbox/virtualbox_7.png)
+
+## UTM
+### UTMとは
+Virtualboxと同じく、ホストOS型の仮想環境を構築するソフトウェアです。macOSで使用できるのが特徴です。
+
+### Debianのインストール
+[公式サイト]()Debianをインストールしてきます。netinst CD イメージ (約 150-300 MB ですがアーキテクチャよって変わります)の、arm64のisoイメージをインストールします。
+
+### 使用方法
+まずは[公式サイト](https://mac.getutm.app)からUTMをダウンロードしてきてください。
+
+次に、UTMを起動してください。起動すると以下のような画面が表示されます。新規仮想マシンを作成を選択します。
+
+![image](assets/UTM/1.png)
+
+仮想化かエミュレートかの選択肢が表示されます。仮想化はMacのCPUをそのまま使用します。エミュレートはソフトウェアで別のCPUを擬似的に再現します。エミュレートでもいいですが、より高速な仮想化を選択します。
+
+![image](assets/UTM/2.png)
+
+OSを選択します。DebianはLinuxなのでLinuxを選択します。
+
+![image](assets/UTM/3.png)
+
+ハードウェアのメモリ容量とCPUコア数を指定します。課題をするだけなら、メモリは2048Mib, CPUコア数は1で十分です。
+*Enable display output*にはチェックを入れておきましょう。チェックを入れないと画面表示が正確にされません。ハードウェアOpenGLアクセラレーションは推奨の通り有効にはしないでおきます。
+
+![image](assets/UTM/4.png)
+
+Apple仮想化は推奨の通り使用しません。起動イメージの種類は*Boot from ISO image*を選択します。起動ISOイメージには、ダウンロードしたarm64のDebianのISOイメージのパスを指定します。
+
+![image](assets/UTM/5.png)
+
+ストレージ容量を指定します。課題では40GiBあれば十分です。
+
+![image](assets/UTM/6.png)
+
+ホストOSとの共有ディレクトリを指定します。何も指定しなくていいです。したければ指定してください。
+
+![image](assets/UTM/7.png)
+
+確認画面です。問題なケラば保存を押してください。間違いがあれば戻るで修正してください。
+
+![image](assets/UTM/8.png)
+
+完成したら、起動してください。再生ボタンを押して起動します。
+
+![iamge](assets/UTM/9.png)
 
 ## Debian
 ### Debian
@@ -172,12 +218,25 @@ GNU GRUBをインストールします。はいを押してください。
 
 以上でインストール完了です！
 
+UTMを使用している場合、一度電源を落とした後に以下のCD/DVDを削除してください。
+
+![image](assets/UTM/10.png)
+
+右上の設定マークを押し、ディスプレイの仮想ディスプレイカードをvirtio-ramfbに変更してください
+
+設定マークを押し、デバイスの新規からシリアルを追加してください。
+
+![image](assets/UTM/11.png)
+
+以上の設定をこなうと、以下のようにウィンドウが２つ開き、UTMでも使用できるようになります！
+
 ### 起動
 Debianを起動すると、
 ```bash
 Please unlock disk sda5_crypt:
 ```
 と表示されます。暗号化LVMのパスワードを入力してロックを解除してください。
+解除できない問題が発生した場合は、コピペで文字を入力してみてください。
 
 次にユーザ名とパスワードが求められるので、入力してロックを解除してください。
 
@@ -185,5 +244,4 @@ Please unlock disk sda5_crypt:
 
 ### suコマンド
 su(switching user)コマンドでユーザーを切り替えれます。
-
 
