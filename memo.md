@@ -361,8 +361,176 @@ aptは簡単で使いやすいです。aptitudeは高度な依存関係の処理
 ### SSH
 **SSH**とは、Secure Shellの略で、ネットワークを経由して別のコンピュータを操作する際に使用するプロトコルのことです。
 
+sshdとufw両方
+
 ### OpenSSH
-SSHプロトコルを行うためのオープンソースソフトウェアのこと。
+SSHプロトコルを行うためのオープンソースソフトウェアのこと。以下のコマンドでインストールします。
+```bash
+sudo apt install openssh-server
+```
+
+sshのステータスは以下のコマンドで確認できます。
+```bash
+sudo  systemctl status ssh
+```
+
+`enabled`の表示が出ていれば「今」SSHサーバーが起動しています。
+`active(running)`の表示が出ていれば、「OS起動時」にサービスを自動で立ち上げます。
+
+それぞれ以下のコマンドでenabled/disabled, active/inactiveを切り替えれます。
+
+```bash
+sudo systemctl start ssh
+sudo systemctl stop ssh
+sudo systemctl restart ssh # activeのまま再起動
+sudo systemctl enable ssh
+sudo systemctl disable ssh
+```
+
+### ufw
+**ufw**は、Debian系Linuxで標準的に使用されるファイアウォール管理ツールです。
+
+```bash
+sudo apt install ufw
+```
+
+でインストールします。
+
+```bash
+sudo ufw status
+```
+
+でステータスを確認します。
+基本的な設定例は以下のとおりです。
+
+```bash
+# 外部からの接続をすべて拒否
+sudo ufw default deny incoming
+# 内部からの通信はすべて許可
+sudo ufw default allow outgoing
+# 特定のポートの通信を許可
+sudo ufw allow [ポート]
+# 特定のポートからの通信を拒否
+sudo ufw deny [ポート]
+# 許可ルールを削除
+sudo ufw delete allow [ポート]
+# 拒否ルールを削除
+sudo ufw delete deny [ポート]
+# 特定のIPからの許可
+sudo ufw allow from [IPアドレス] to any port [ポート] proto tcp
+# 状態確認
+sudo ufw status verbose
+```
+`sudo ufw allow 4242`で、4242のポートの見通し用にしてください。
+
+### /etc/ssh/sshd_config
+`/etc/ssh/sshd_config`は、ssh関連の設定を刷るファイルです。なんでもいいですが、nanoで編集するなら以下のようにします。
+
+```bash
+sudo nano /etc/ssh/sshd_config
+```
+
+**# Port 22**の部分のコメントを外し、**Port 4242**にすることにより、4242のポートの接続を許可します。SSH接続を最低限するにはここの設定のみで大丈夫です。 設定をしたければ他にも色々設定できます。
+
+以下のコマンドでsshd_configの設定を反映させます。
+```bash
+sudo systemctl restart sshd
+```
+#### systemctl
+debianでは、初期システムであるsystemdを操作するために、systemctlコマンドを使用します。基本的なコマンドは以下です。
+```bash
+sudo systemctl start [サービス名]
+sudo systemctl stop [サービス名]
+sudo systemctl restart [サービス名]
+sudo systemctl status [サービス名]
+# Linuxの起動時に指定したサービスを自動的に起動するためのコマンド
+sudo systemctl enable [サービス名]
+sudo systemctl disable [サービス名]
+sudo systemctl status [サービス名]
+```
+
+### VirtualBoxの設定
+一度debianの電源を落として、VirtualBoxホーム画面でSettingを開いてください。SettingでNetworkを選択してください。すると、以下のような画面が表示されます。
+
+![image](assets/virtualbox/8.png)
+
+Advancedを押してください。以下のような画面になるので、Port Forwardingを押してください。
+
+![image](assets/virtualbox/9.png)
+
+最後に、右上のプラスマークを押して、新規のルールを追加します。Guest Portは課題の要件通り4242にしてください。Host Portは何でも構いません。
+
+![image](assets/virtualbox/10.png)
+
+### ホストOSからのSSH接続
+openSSHの設定、ufwの設定、/etc/ssh/sshd_configの設定、VirtualBoxの設定がすべて完了すると、ホストOSのターミナルからSSH接続でDebianを操作できるようになります。Debianを起動している状態で、ホストOSで以下のコマンドを実行してください
+
+```bash
+ssh [ゲストOSのユーザ名]@[ゲストOSのIPアドレス] -p [ホストポート]
+
+ssh [ゲストOSのユーザ名]@localhost -p [ホストポート]
+```
+
+ipアドレスは以下のコマンドで確認できます。
+```bash
+ip a
+```
 
 
 
+
+
+
+
+
+
+## ユーザとグループ
+### ユーザの種類
+ユーザには、一般ユーザ、rootユーザ、システムユーザが存在する。
+一般ユーザは一般的なユーザです。
+rootユーザはスーパーユーザともよばれ、すべての権限を持っているシステム管理者向けのユーザです。
+システムユーザは、アプリケーションや常時かどうするサービス用に作成されるユーザです。
+
+### ユーザの管理コマンド
+ユーザを管理するコマンドは以下のとおりです。
+```bash
+id          # uid(ユーザID), ユーザ名, gid(グループID), groups(サブグループ名)
+adduser     # ユーザの作成(/home/配下にディレクトリを作成)
+useradd     # ユーザの作成(/home/配下にディレクトリを作成しない)
+usermod     # ユーザの設定変更
+userdel     # ユーザの削除
+passwd      # ユーザのパスワード設定変更
+```
+
+ユーザ一覧を表示させたい場合は以下のコマンドを実行します。
+```bash
+cat /etc/passwd
+```
+
+### グループの種類
+Linuxはマルチユーザ対応OSであり、複数の人が同時に接続して使用することが可能です。そのため、誰でも自由にファイルやディレクトリが使われることがないように、アクセス制御を設定できます。
+
+グループは、**メイングループ**と**サブグループ**に分類されます。
+
+メイングループは、ユーザ１人に対して必ず１つ割り当てられます。基本的にユーザ名と同じ名前のグループになります。
+
+サブグループは、メイングループに追加で所属させるグループを設定できます。
+
+グループを確認したい場合は以下のコマンドを実行します。
+
+```bash
+cat /etc/group
+groups [ユーザ名]
+```
+
+### グループの管理コマンド
+グループを管理刷るコマンドは以下のとおりです。
+```bash
+groupadd [グループ名]              # グループの作成
+usermod -g [グループ名] [ユーザ名]  # メイングループの追加
+usermod -aG [グループ名] [ユーザ名] # サブグループの追加
+useradd -G [グループ名] [ユーザ名] # サブグループの変更
+groupdel [グループ名] # グループの削除
+getent group [グループ名] # ユーザが所属するグループの表示
+gpassed -a
+```
