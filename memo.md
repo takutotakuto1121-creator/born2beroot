@@ -301,7 +301,7 @@ whoami
 id
 ```
 
-#### /etc/sudoers
+#### /etc/sudoers(権限設定)
 **/etc/sudoers**は、sudoコマンドで変更できるユーザと実行出来るコマンドを記述する設定ファイルです。
 `/etc/sudoers`は、設定を1文字でも間違えると二度とsudoが使えなくなり、システムを壊してしまう可能性のある非常に危険なファイルです。そのため、直接`vi /etc/sudoers`で編集することは推奨されません。
 以下の専用コマンドを使用してください。
@@ -324,6 +324,52 @@ tsugimot ALL=(ALL:ALL) ALL
 ```bash
 tsugimot ALL=(ALL:ALL) NOPASSWD: ALL
 ```
+
+#### /etc/sudoers(Defaultの設定)
+
+```bash
+sudo apt install man
+```
+
+で`man`をインストールし、
+
+```bash
+man sudoers
+```
+
+で`etc/sudoers`の詳細情報が見れます。
+特に**SUDOERS**のオプションのセクションでは`Default`に与えることのできるパラメータの一覧が見れます。
+
+これを参考にして、`/etc/sudoers`に以下の内容を書き込んでください。
+
+```conf
+# sudo実行時にパスワードを間違えた際、再入力できる上限回数を3回に制限します。
+Defaults        passwd_tries=3
+
+# パスワードを間違えた際に表示されるエラーメッセージを、指定したテキストに変更します。
+Defaults        badpass_message="Wrong password!"
+
+# 「誰が、いつ、何のコマンドをsudoで実行したか」という基本的な実行履歴を指定したファイルに記載します。
+Defaults        logfile="/var/log/sudo/sudo.log"
+
+# log_input, log_outputで取得したコマンドの実行中の詳細な入出力データを保存するディレクトリを指定します。
+Defaults        iolog_dir="/var/log/sudo"
+
+# sudoでコマンドを実行している最中に、ユーザがキーボードなどから入力した全ての内容(標準入力)を記録します。
+Defaults        log_input
+
+# sudoでコマンドを実行して標準出力に出力された結果を全て記録します。
+Defaults        log_output
+
+# sudoの実行を、実際のターミナル画面(TTY)を通じた操作のみに制限します。自動スクリプトなどからsudoが実行されるのを防ぎます。
+Defaults        requiretty
+
+# sudo実行時に探すパスを指定されたシステムの安全なディレクトリのみに制限します。
+Defaults        secure_path="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin"
+```
+
+`secure_path`について、悪意のあるユーザーがシステムを破壊するウイルスを`/home/hacker`作成し、それに`ls`という名前をつけます。その状態で誰かが`sudo ls`を実行してしまうとrootの絶大な権限で実行してしまいます。
+それを防ぐために、安全なパスのみに制限しています。
 
 ### nano
 テキストエディタの１つ。大体のLinuxには標準でインストールされている
@@ -449,6 +495,13 @@ sudo systemctl disable [サービス名]
 sudo systemctl status [サービス名]
 ```
 
+#### ~/.ssh/config
+ホストOSの~/.ssh/configにいらない情報が含まれていると、接続の際にエラーが出てくることがあります。この場合はエラーの該当箇所を修正するか、
+```bash
+rm -rf ~/.ssh/config
+```
+でファイルごと削除してしまいましょう。
+
 ### VirtualBoxの設定
 一度debianの電源を落として、VirtualBoxホーム画面でSettingを開いてください。SettingでNetworkを選択してください。すると、以下のような画面が表示されます。
 
@@ -475,14 +528,6 @@ ipアドレスは以下のコマンドで確認できます。
 ```bash
 ip a
 ```
-
-
-
-
-
-
-
-
 
 ## ユーザとグループ
 ### ユーザの種類
@@ -534,3 +579,163 @@ groupdel [グループ名] # グループの削除
 getent group [グループ名] # ユーザが所属するグループの表示
 gpassed -a
 ```
+
+## パスワードポリシーの設定
+### /etc/login.defs
+パスワードポリシーを設定できるファイル。
+```bash
+sudo nano /etc/login.defs
+```
+で開きます。
+
+`PASS_MAX_DAYS`, `PASS_MIN_DAYS`, `PASS_WARN_AGE`が枯れている部分を探し、以下のように書き換えます。
+```
+PASS_MAX_DAYS   30
+PASS_MIN_DAYS   2
+PASS_WARN_AGE   7
+```
+`PASS_MAX_DAYS`は、指定した数字の日の間に少なくとも１回パスワードを変更しなければならないというルールを定める部分です。
+
+`PASS_MIN_DAYS`は、一度パスワードを変更してから指定した日付の間はパスワードを変更できないというルールを定める部分です。
+
+`PASS_WARN_AGE`は、指定した日に一回パスワードを変更してくださいという警告を表示するルールを定める部分です。
+
+### /etc/security/pwquality.conf
+まずは以下のパッケージをインストールしてください
+```bash
+sudo apt install -y lipam-pwquality
+```
+
+すると、`/etc/security/pwquality.conf`を設定できるようになります。
+```bash
+sudo nano /etc/security/pwquality.conf
+```
+で開いて、以下のように設定してください。
+
+```conf
+# Number of characters in the new password that must not be present in the
+# old password.
+difok = 7
+
+# Minimum acceptable size for the new password (plus one if
+# credits are not disabled which is the default). (See pam_cracklib manual.)
+# Cannot be set to lower value than 6.
+minlen = 10
+
+# The maximum credit for having digits in the new password. If less than 0
+# it is the minimum number of digits in the new password.
+dcredit = -1
+
+# The maximum credit for having uppercase characters in the new password.
+# If less than 0 it is the minimum number of uppercase characters in the new
+# password.
+ucredit = -1
+
+# The maximum credit for having lowercase characters in the new password.
+# If less than 0 it is the minimum number of lowercase characters in the new
+# password.
+lcredit = -1
+
+# The maximum number of allowed consecutive same characters in the new password.
+# The check is disabled if the value is 0.
+maxrepeat = 3
+
+# Whether to check if it contains the user name in some form.
+# The check is enabled if the value is not 0.
+usercheck = 1
+
+# Enforces pwquality checks on the root user password.
+# Enabled if the option is present.
+enforce_for_root
+```
+
+それぞれの項目の意味は、デフォルトでコメントで書かれている通りです。
+`enforce_for_root`について、すべての項目がrootのパスワードポリシーにも含まれるように感じますが、`disfok`のみは含まれないような仕様になっています。
+
+### パスワードの変更
+`passewd`コマンドでパスワードを変更することができる。
+以下のコマンドで、ユーザ、ルートのパスワードを変更できる。
+パスワードポリシーに違反している場合はエラーメッセージが表示される。
+
+```bash
+passwd [ユーザ名]
+passwd root
+```
+
+## monitoring.sh
+### OSのアーキテクチャとカーネルのバージョンの確認
+以下のコマンドで確認可能です。`monitoring.sh`では、`uname -a`を使用しています。
+
+```bash
+cat /proc/version
+uname -a
+```
+
+### 物理CPU(physical CPU)数と仮想CPU(Virtual CPU)数の確認
+以下のコマンドで確認可能です。
+
+```bash
+cat /proc/cpuinfo   # processorが仮想CPUの数、physical isが物理CPUの数
+lscpu   # CPU(s)が仮想CPUの数、Socket(s)が物理CPUの数
+nproc   # 仮想CPUの総数のみ
+```
+
+### RAMの使用状況の確認
+`free`コマンドと`top`コマンドで確認可能です。`monitoring.sh`では`free`コマンドを使用しています。
+
+#### free
+`free`コマンドの主なオプションは以下の通りです。
+
+| オプション | 説明 |
+|---|---|
+| -b | メモリ容量をバイト単位で表示 |
+| -k | メモリ容量をキロバイト単位で表示 |
+| -m | メモリ容量をメガバイト単位で表示 |
+| -g | メモリ容量をギガバイト単位で表示 |
+| -r | メモリとスワップ領域の合計を表示 |
+
+`free`コマンドを使用した時のそれぞれの項目は以下のようになります。
+
+| 項目 | 説明 |
+|---|---|
+| total | メインメモリのサイズ |
+| used | メモリ使用量 |
+| free | メモリの空き容量 |
+| shared | 共有メモリ |
+| buffer | バッファのキャッシュ |
+| cached | ページのキャッシュ |
+
+よって、totalとusedを参照すれば、`monitoring.sh`で活用できます。
+
+#### top
+%cpuがCPU使用率、%MEMがメモリ使用率です。
+
+### ストレージの使用状況の確認
+`df`コマンド, `lsblk`コマンドで確認できます。
+
+`df`コマンドは、`df -h`としてオプションをつけることにより、人間が読みやすい形式で出力されます。
+
+マウントポイントが/(root)の場所を見れば全体のサイズが見れますが、LVMでパーティション分割をしている場合はここにあるものが全てではないので、普通に使用しても見れません。
+
+```bash
+df -h -T -x tmpfs -x devtmpfs --total
+```
+オプションを指定しまくれば見れます。
+
+`lsblk`コマンドは、ツリー構造でストレージの使用状況が出力されます。
+
+オプションをつけることにより、項目を指定することができます。
+
+```bash
+lsblk -o NAME,SIZE,FSUSE%
+```
+
+指定できる項目一覧は。
+```bash
+lsblk --list-columns
+```
+で確認できます。
+
+出力されたNAMEのうち、`vda`が全体のストレージに対応します。
+
+### 
