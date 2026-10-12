@@ -4,7 +4,7 @@
 利用する仮想化ソフトウェアによって、**ホスト型**, **ハイパーバイザー型**の２種類に分類される。ホスト型では、ホストOS上に仮想化ソフトウェアを立ち上げ、そこでゲストOSを運用する、ハイパーバイザー型では、ハイパーバイザーと呼ばれる仮想化ソフトウェアを動作させ、その上でゲストOSを運用します。
 このような仮想マシンのことを**Virtual Machine(VM)**といいます。
 
-![image](assets/host_hyper.png)
+![image](../assets/host_hyper.png)
 画像は[引用元](https://www.kagoya.jp/howto/engineer/itsystem/virtualization/)より引用
 
 ## Linux
