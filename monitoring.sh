@@ -33,7 +33,7 @@ Broadcast message from root@tsugimot42 (tty1) ($date_now):
     #Physical CPU: $Physical_CPU
     #vCPU: $Virtual_CPU
     #Memory Disk: $RAM_used/$RAM_total ($RAM_percent%)
-    #Disk Usage: $storage_usedMB/$storage_totalMB ($storage_percent%)
+    #Disk Usage: $storage_used/$storage_total ($storage_percent%)
     #CPU load: $CPU_utilization%
     #Last boot: $reboot_date $reboot_time
     #LVM use: $LVM_use
