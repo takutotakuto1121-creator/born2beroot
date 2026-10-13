@@ -195,7 +195,7 @@ linuxの**cron**は、指定した日時や周期でプログラムやシェル�
 ```
 
 ### 編集
-`ctonrab -e`で開けます。開いて、
+`crontab -e`で開けます。開いて、
 
 ```bash
 */10 * * * * /home/tsugimot/monitoring.sh
@@ -226,6 +226,7 @@ LVM_count=$(ls /dev/mapper | wc -w)
 connection_num=$(ss -tn state established | grep -v "^Recv-Q" | wc -l)
 user_num=$(w | grep "users" | awk '{print $5}')
 ip_v4=$(ip -4 a | grep inet | tr '\n' ' ' | awk '{print $2}' | tr '/' '\n' | head -n 1)
+mac_adress=$(ip link show | grep link/ether | awk '{print $2}')
 sudo_num=$(cat /var/log/sudo/sudo.log | grep COMMAND | wc -l)
 date_now=$(date)
 
@@ -236,20 +237,17 @@ else
 fi
 
 wall "
-Broadcast message from root@tsugimot42 (tty1) ($date_now):
-
     #Architecture: $Architecture
     #Physical CPU: $Physical_CPU
     #vCPU: $Virtual_CPU
-    #Memory Disk: $RAM_used/$RAM_total ($RAM_percent%)
+    #Memory Usage: $RAM_used/$RAM_total ($RAM_percent%)
     #Disk Usage: $storage_used/$storage_total ($storage_percent%)
     #CPU load: $CPU_utilization%
     #Last boot: $reboot_date $reboot_time
     #LVM use: $LVM_use
     #TCP Connections: $connection_num ESTABLISHED
     #User log: $user_num
-    #Network: IP $ip_v4
+    #Network: IP $ip_v4 ($mac_address)
     #Sudo: $sudo_num cmd
 "
-
 ```

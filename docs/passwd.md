@@ -21,7 +21,7 @@ PASS_WARN_AGE   7
 ## /etc/security/pwquality.conf
 まずは以下のパッケージをインストールしてください
 ```bash
-sudo apt install -y lipam-pwquality
+sudo apt install -y libpam-pwquality
 ```
 
 すると、`/etc/security/pwquality.conf`を設定できるようになります。

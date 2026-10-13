@@ -52,4 +52,16 @@ getent group [グループ名] # ユーザが所属するグループの表示
 gpassed -a
 ```
 
-## 
+## ユーザ、グループの演習
+課題の指示通りに、ユーザを追加し、グループの設定を行います。以下のような指示があります。
+
+1. rootユーザに加えて、自分のintra名のユーザが存在すること
+2. そのユーザは`user42`グループと`root`グループに所属すること。
+
+以下のコマンドで実現できます。
+
+```bash
+sudo groupadd user42
+sudo usermod -aG user42 tsugimot
+sudo usermod -aG sudo tsugimot
+```
