@@ -52,6 +52,21 @@ getent group [グループ名] # ユーザが所属するグループの表示
 gpassed -a
 ```
 
+## ホストネームの管理コマンド
+`hostname`は自在に変更することができます。
+`hostname`に関するコマンドでよく使われるコマンドは以下のようなコマンドです。
+
+```bash
+# hostnameの確認
+hostname
+# hostnameの変更(一時的)
+hostname [新しいhostname]
+# hostnameの変更(永久的)
+sudo hostnamectl set-hostname [新しいhostname]
+# hostnameの確認、変更(永久的)
+sudo nano /etc/hostname
+```
+
 ## ユーザ、グループの演習
 課題の指示通りに、ユーザを追加し、グループの設定を行います。以下のような指示があります。
 
