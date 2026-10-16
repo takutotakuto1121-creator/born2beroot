@@ -4,6 +4,21 @@
 課題提出後にVMを起動して、ハッシュ値が一致していれば完全に同じ設定のVMであることが証明できます。
 
 ## 作成手順(VirtualBoxの場合)
+まずは起動したままだと、ファイルの中身が変動し続けるため、UTM上でVMを完全にシャットダウンします。
+
+42Tokyo校舎のUbuntuだと、VMのデータは以下のようなPATHにあります。
+
+```
+~/goinfre/born2beroot/born2beroot/born2beroot.vdi
+```
+
+ハッシュ化します。
+
+```bash
+shasum ~/goinfre/born2beroot/born2beroot/born2beroot.vdi
+```
+
+出力結果のハッシュ値を`signature.txt`を保存します。
 
 ## 作成手順(UTMの場合)
 まずは起動したままだと、ファイルの中身が変動し続けるため、UTM上でVMを完全にシャットダウンします。

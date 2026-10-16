@@ -215,6 +215,11 @@ linuxの**cron**は、指定した日時や周期でプログラムやシェル�
 @reboot sleep 60 && /home/tsugimot/monitoring.sh
 ```
 
+また、cronのログの確認方法は以下です。
+```bash
+sudo journalctl -u cron -b
+```
+
 ## monitoring.sh
 以上を踏まえて、以下のようなスクリプトにしています。
 

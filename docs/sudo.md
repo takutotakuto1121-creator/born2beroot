@@ -71,6 +71,10 @@ tsugimot ALL=(ALL:ALL) ALL
 tsugimot ALL=(ALL:ALL) NOPASSWD: ALL
 ```
 
+グループごと許可したい場合はグループ名のまえに%をつけます。それ以外は同じです。
+
+
+
 ### Defaultの設定
 
 ```bash
