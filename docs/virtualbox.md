@@ -21,7 +21,7 @@ Nameには仮想環境の名前を、Folderには仮想環境を構築するフ�
 
 *Skip Unattended Installation*にはチェックを入れておきましょう。オートインストールをしてしまうと、 GUIつきのDebianになってしまいます。
 
-![image](../assets/virtualbox/virtualbox_3.png)
+![image](../assets/virttualbox/virtualbox_3.png)
 
 次に、RAMとCPUの割り当てを行います。RAMのメモリは今回は2048MBあれば十分です。CPUも１で構いません。
 

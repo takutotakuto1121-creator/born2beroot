@@ -61,6 +61,8 @@ sudo ufw delete deny [ポート]
 sudo ufw allow from [IPアドレス] to any port [ポート] proto tcp
 # 状態確認
 sudo ufw status verbose
+# アクティベート
+sudo ufw enable
 ```
 `sudo ufw allow 4242`で、4242のポートの見通し用にしてください。
 
@@ -71,7 +73,7 @@ sudo ufw status verbose
 sudo nano /etc/ssh/sshd_config
 ```
 
-**# Port 22**の部分のコメントを外し、**Port 4242**にすることにより、4242のポートの接続を許可します。SSH接続を最低限するにはここの設定のみで大丈夫です。 
+**# Port 22**の部分のコメントを外し、**Port 4242**にすることにより、4242のポートの接続を許可します。SSH接続を最低限するにはここの設定のみで大丈夫です。
 ```bash
 Port 4242
 ```
